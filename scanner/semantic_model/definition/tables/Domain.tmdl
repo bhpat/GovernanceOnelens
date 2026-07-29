@@ -1,0 +1,45 @@
+/// One row per Fabric governance domain, including its optional parent in the domain hierarchy.
+table Domain
+
+	/// Total number of governance domains
+	measure '# Domains' = COUNTROWS('Domain')
+		formatString: #,##0
+
+	column 'Domain Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: DomainId
+
+	/// Fabric display name of the governance domain.
+	column 'Domain Name'
+		dataType: string
+		sourceColumn: DomainName
+
+	/// Business purpose and stewardship context recorded for the domain.
+	column 'Domain Description'
+		dataType: string
+		sourceColumn: DomainDescription
+
+	column 'Parent Domain Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ParentDomainId
+
+	/// Display name of the parent domain; blank indicates a top-level domain.
+	column 'Parent Domain Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ParentDomainName
+
+	partition Domain = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_DomainDimension = Source{[Schema="dbo", Item="vw_DomainDimension"]}[Data]
+			in
+			    vw_DomainDimension

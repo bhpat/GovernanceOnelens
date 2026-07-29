@@ -1,0 +1,92 @@
+/// One row per captured dependency or data-movement relationship between governance assets.
+table 'Lineage Edges'
+
+	/// Total number of lineage relationships captured
+	measure '# Lineage Edges' = COUNTROWS('Lineage Edges')
+		formatString: #,##0
+
+	column 'Edge Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: EdgeId
+
+	column 'From Item Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: FromItemId
+
+	/// Upstream asset or external source at the start of the relationship.
+	column 'From Item Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: FromItemName
+
+	/// Artifact or source type for the upstream endpoint.
+	column 'From Item Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: FromItemType
+
+	column 'To Item Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ToItemId
+
+	/// Downstream asset at the destination of the relationship.
+	column 'To Item Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ToItemName
+
+	/// Artifact type for the downstream endpoint.
+	column 'To Item Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ToItemType
+
+	/// Captured relationship verb, such as DependsOn, Reads, Writes, Shortcut, or Orchestrates.
+	column Relationship
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Relationship
+
+	/// Normalized class: movement for physical data flow, dependency for logical or process flow.
+	column 'Relationship Category'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: RelationshipCategory
+
+	/// Connector that reported the relationship.
+	column 'Source System'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SourceSystem
+
+	/// Timestamp when Governance OneLens first captured the relationship.
+	column 'First Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: FirstSeen
+
+	/// Timestamp when the most recent scan confirmed the relationship still existed.
+	column 'Last Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: LastSeen
+
+	partition 'Lineage Edges' = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_LineageEdge = Source{[Schema="dbo", Item="vw_LineageEdge"]}[Data]
+			in
+			    vw_LineageEdge

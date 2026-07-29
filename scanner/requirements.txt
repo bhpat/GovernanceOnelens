@@ -1,0 +1,5 @@
+# fabric-inventory scanner deps (local dev / Fabric Notebook)
+# In a Fabric Notebook these are preinstalled or available via the environment.
+requests>=2.31
+pyodbc>=5.0
+azure-identity>=1.17

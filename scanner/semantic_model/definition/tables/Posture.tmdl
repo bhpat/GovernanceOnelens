@@ -1,0 +1,66 @@
+/// Current governance health signals by tenant or workspace scope; units depend on Signal.
+table Posture
+
+	/// Average value for one selected posture signal; blank when signals with different units are mixed.
+	measure 'Average Posture Value' = IF(HASONEVALUE('Posture'[Signal]), AVERAGE('Posture'[Value]))
+		formatString: #,##0.0
+
+	column 'Fact Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: FactId
+
+	/// Governance health signal being reported, such as item count, stale items, or access assignments.
+	column Signal
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Signal
+
+	/// Grain of the signal: tenant or workspace.
+	column 'Scope Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeType
+
+	column 'Scope Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ScopeId
+
+	/// Human-readable tenant or workspace represented by the row.
+	column 'Scope Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeName
+
+	/// Numeric result; interpret its unit using Signal and do not average unrelated signals.
+	column Value
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: Value
+
+	/// Derived health classification for the signal when one is available.
+	column Status
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Status
+
+	/// Timestamp when the current posture row was calculated.
+	column 'Computed At'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: ComputedAt
+
+	partition Posture = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_PostureFact = Source{[Schema="dbo", Item="vw_PostureFact"]}[Data]
+			in
+			    vw_PostureFact

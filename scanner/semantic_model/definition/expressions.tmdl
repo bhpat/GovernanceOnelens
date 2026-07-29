@@ -1,0 +1,2 @@
+expression Server = "__ONELENS_SQL_SERVER__" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression Database = "__ONELENS_SQL_DB__" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]

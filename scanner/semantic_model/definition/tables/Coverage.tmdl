@@ -1,0 +1,72 @@
+/// Current governance coverage by metric and scope; one row per metric for the tenant or a workspace.
+table Coverage
+
+	/// Average coverage percent for one selected metric; blank when multiple metrics are selected.
+	measure 'Average Coverage (%)' = IF(HASONEVALUE('Coverage'[Metric]), AVERAGE('Coverage'[Coverage (%)]))
+		formatString: 0.0"%"
+
+	column 'Fact Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: FactId
+
+	/// Coverage rule being measured, such as owned, described, sensitivity labeled, or endorsed.
+	column Metric
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Metric
+
+	/// Grain of the result: tenant or workspace.
+	column 'Scope Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeType
+
+	column 'Scope Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ScopeId
+
+	/// Human-readable tenant or workspace represented by the row.
+	column 'Scope Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeName
+
+	/// Number of assets satisfying the coverage rule.
+	column Numerator
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Numerator
+
+	/// Number of in-scope assets evaluated for the coverage rule.
+	column Denominator
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Denominator
+
+	/// Coverage on a 0-to-100 scale, not a 0-to-1 fraction.
+	column 'Coverage (%)'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: Percent
+
+	/// Timestamp when the current coverage row was calculated.
+	column 'Computed At'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: ComputedAt
+
+	partition Coverage = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_CoverageFact = Source{[Schema="dbo", Item="vw_CoverageFact"]}[Data]
+			in
+			    vw_CoverageFact

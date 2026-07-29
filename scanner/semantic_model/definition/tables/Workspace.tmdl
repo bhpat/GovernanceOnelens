@@ -1,0 +1,59 @@
+/// One row per Fabric workspace, including lifecycle state, capacity reference, and governance domain.
+table Workspace
+
+	/// Total number of workspaces in the tenant
+	measure '# Workspaces' = COUNTROWS('Workspace')
+		formatString: #,##0
+
+	column 'Workspace Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: WorkspaceId
+
+	/// Fabric display name of the workspace.
+	column 'Workspace Name'
+		dataType: string
+		sourceColumn: WorkspaceName
+
+	/// Fabric workspace classification reported by the tenant admin API.
+	column 'Workspace Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: WorkspaceType
+
+	/// Current Fabric workspace lifecycle state.
+	column 'Workspace State'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: WorkspaceState
+
+	column 'Capacity Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: CapacityId
+
+	column 'Domain Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: DomainId
+
+	/// Governance domain assigned to the workspace; Unassigned means no domain mapping exists.
+	column 'Domain Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: DomainName
+
+	partition Workspace = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_WorkspaceDimension = Source{[Schema="dbo", Item="vw_WorkspaceDimension"]}[Data]
+			in
+			    vw_WorkspaceDimension

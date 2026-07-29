@@ -1,0 +1,78 @@
+/// Append-only scan history for coverage and posture metrics, used for trends and drift analysis.
+table 'Metric History'
+
+	/// Average value for one selected metric family and metric; blank when incompatible units are mixed.
+	measure 'Average Metric Value' = IF(HASONEVALUE('Metric History'[Kind]) && HASONEVALUE('Metric History'[Metric]), AVERAGE('Metric History'[Value]))
+		formatString: #,##0.0
+
+	column 'Fact Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: FactId
+
+	/// Metric family: coverage or posture.
+	column Kind
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Kind
+
+	/// Coverage metric or posture signal captured at this point in time.
+	column Metric
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Metric
+
+	/// Grain of the historical value: tenant or workspace.
+	column 'Scope Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeType
+
+	column 'Scope Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ScopeId
+
+	/// Human-readable tenant or workspace represented by the row.
+	column 'Scope Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeName
+
+	/// Recorded result; coverage uses a 0-to-100 scale while posture units depend on Metric.
+	column Value
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: Value
+
+	/// Number satisfying a historical coverage rule; blank for posture rows.
+	column Numerator
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Numerator
+
+	/// Number evaluated for a historical coverage rule; blank for posture rows.
+	column Denominator
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Denominator
+
+	/// UTC timestamp when the scan captured this metric value.
+	column 'Captured At'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: CapturedAt
+
+	partition 'Metric History' = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_MetricHistoryFact = Source{[Schema="dbo", Item="vw_MetricHistoryFact"]}[Data]
+			in
+			    vw_MetricHistoryFact

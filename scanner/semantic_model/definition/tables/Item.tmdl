@@ -1,0 +1,246 @@
+/// One row per Fabric catalog asset, enriched with governance, ownership, schema, and operational metadata.
+table Item
+
+	/// Total number of governed assets in the catalog
+	measure '# Items' = COUNTROWS('Item')
+		formatString: #,##0
+
+	/// Percent of items with a known owner
+	measure 'Ownership Coverage (%)' = DIVIDE(SUM('Item'[Has Owner]), [# Items])
+		formatString: 0.0%
+
+	/// Percent of items with a description
+	measure 'Documentation Coverage (%)' = DIVIDE(SUM('Item'[Has Description]), [# Items])
+		formatString: 0.0%
+
+	/// Percent of items with a sensitivity label
+	measure 'Sensitivity Coverage (%)' = DIVIDE(SUM('Item'[Has Sensitivity Label]), [# Items])
+		formatString: 0.0%
+
+	/// Percent of items that are endorsed (promoted or certified)
+	measure 'Endorsement Coverage (%)' = DIVIDE(SUM('Item'[Has Endorsement]), [# Items])
+		formatString: 0.0%
+
+	/// Percent of items with owner, description, sensitivity label, and endorsement all set
+	measure 'Fully Governed (%)' = DIVIDE(SUM('Item'[Is Fully Governed]), [# Items])
+		formatString: 0.0%
+
+	/// Number of items not modified in over 90 days
+	measure '# Stale Items' = SUM('Item'[Is Stale])
+		formatString: #,##0
+
+	/// Combined storage size of selected items in bytes; only populated when the source API reports size.
+	measure 'Total Size (Bytes)' = SUM('Item'[Size Bytes])
+		formatString: #,##0
+
+	/// Number of semantic-model tables across the selected items.
+	measure '# Tables' = SUM('Item'[Table Count])
+		formatString: #,##0
+
+	/// Number of semantic-model columns across the selected items.
+	measure '# Columns' = SUM('Item'[Column Count])
+		formatString: #,##0
+
+	column 'Item Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ItemId
+
+	/// Fabric display name of the governed asset; use this when listing or identifying items.
+	column 'Item Name'
+		dataType: string
+		sourceColumn: ItemName
+
+	/// Fabric artifact type, such as Report, SemanticModel, Lakehouse, Notebook, or DataPipeline.
+	column 'Item Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ItemType
+
+	/// Connector that discovered the item; currently fabric for native tenant inventory.
+	column 'Source System'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SourceSystem
+
+	/// Business description stored on the Fabric item; blank means the item is undocumented.
+	column Description
+		dataType: string
+		sourceColumn: Description
+
+	/// Display name or user principal name of the captured item owner.
+	column Owner
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Owner
+
+	/// Fabric trust designation, normally Promoted or Certified; blank means not endorsed.
+	column Endorsement
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Endorsement
+
+	/// Microsoft Information Protection label applied to the item; a source GUID is retained when its name cannot be resolved.
+	column 'Sensitivity Label'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: SensitivityLabel
+
+	/// Source tag names serialized as a JSON array; blank means the item has no captured tags.
+	column Tags
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Tags
+
+	column 'Deep Link'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		sourceColumn: DeepLink
+
+	column 'Workspace Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: WorkspaceId
+
+	/// Current Fabric workspace containing the item; Unknown workspace means the reference could not be resolved.
+	column 'Workspace Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: WorkspaceName
+
+	column 'Domain Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: DomainId
+
+	/// Governance domain inherited from the item or its workspace; Unassigned means no domain mapping exists.
+	column 'Domain Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: DomainName
+
+	/// Source-system creation timestamp when the Fabric API reports one.
+	column 'Created Date'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+	/// Most recent source-system modification timestamp; used to determine whether an item is stale.
+	column 'Modified Date'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: ModifiedDate
+
+	/// Identity reported as the most recent modifier of the item.
+	column 'Modified By'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ModifiedBy
+
+	/// Latest captured semantic-model refresh state, such as Completed or Failed.
+	column 'Refresh Status'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: RefreshStatus
+
+	/// Timestamp of the latest captured semantic-model refresh attempt.
+	column 'Last Refresh'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: LastRefresh
+
+	column 'Size Bytes'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: SizeBytes
+
+	column 'Table Count'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: TableCount
+
+	column 'Column Count'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ColumnCount
+
+	column 'Has Owner'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: HasOwner
+
+	column 'Has Description'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: HasDescription
+
+	column 'Has Sensitivity Label'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: HasSensitivityLabel
+
+	column 'Has Endorsement'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: HasEndorsement
+
+	column 'Is Fully Governed'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: IsFullyGoverned
+
+	column 'Is Stale'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: IsStale
+
+	/// Timestamp when Governance OneLens first discovered the item.
+	column 'First Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: FirstSeen
+
+	/// Timestamp when the most recent complete scan confirmed the item still existed.
+	column 'Last Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: LastSeen
+
+	partition Item = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_ItemDimension = Source{[Schema="dbo", Item="vw_ItemDimension"]}[Data]
+			in
+			    vw_ItemDimension

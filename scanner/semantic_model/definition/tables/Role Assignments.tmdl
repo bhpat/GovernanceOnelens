@@ -1,0 +1,88 @@
+/// One row per captured workspace or item access grant to a user, group, or service principal.
+table 'Role Assignments'
+
+	/// Total number of role assignments captured
+	measure '# Role Assignments' = COUNTROWS('Role Assignments')
+		formatString: #,##0
+
+	/// Distinct users, groups, and service principals with captured access
+	measure '# Access Principals' = DISTINCTCOUNT('Role Assignments'[Principal Id])
+		formatString: #,##0
+
+	/// Role assignments granted to Entra groups
+	measure '# Group Assignments' = CALCULATE(COUNTROWS('Role Assignments'), 'Role Assignments'[Principal Type] = "Group")
+		formatString: #,##0
+
+	column 'Fact Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: FactId
+
+	column 'Principal Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: PrincipalId
+
+	/// Display name or user principal name of the identity; return only when explicitly requested.
+	column 'Principal Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PrincipalName
+
+	/// Identity class, such as User, Group, ServicePrincipal, or App.
+	column 'Principal Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: PrincipalType
+
+	/// Access role granted at the captured scope.
+	column Role
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Role
+
+	/// Kind of secured object receiving the grant, normally Workspace or Item.
+	column 'Scope Type'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeType
+
+	column 'Scope Id'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		summarizeBy: none
+		sourceColumn: ScopeId
+
+	/// Display name of the workspace, item, or domain receiving the grant.
+	column 'Scope Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: ScopeName
+
+	/// Timestamp when Governance OneLens first captured the assignment.
+	column 'First Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: FirstSeen
+
+	/// Timestamp when the most recent scan confirmed the assignment still existed.
+	column 'Last Seen'
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: LastSeen
+
+	partition 'Role Assignments' = m
+		mode: directQuery
+		source =
+			let
+			    Source = Sql.Database(#"Server", #"Database"),
+			    vw_RoleAssignmentFact = Source{[Schema="dbo", Item="vw_RoleAssignmentFact"]}[Data]
+			in
+			    vw_RoleAssignmentFact

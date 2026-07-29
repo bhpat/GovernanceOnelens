@@ -1,0 +1,27 @@
+relationship 'Item-Workspace'
+	fromColumn: Item.'Workspace Id'
+	toColumn: Workspace.'Workspace Id'
+
+relationship 'Item-Domain'
+	fromColumn: Item.'Domain Id'
+	toColumn: Domain.'Domain Id'
+
+relationship 'LineageEdges-FromItem'
+	fromColumn: 'Lineage Edges'.'From Item Id'
+	toColumn: Item.'Item Id'
+
+relationship 'Coverage-Workspace'
+	fromColumn: Coverage.'Scope Id'
+	toColumn: Workspace.'Workspace Id'
+
+relationship 'Posture-Workspace'
+	fromColumn: Posture.'Scope Id'
+	toColumn: Workspace.'Workspace Id'
+
+relationship 'MetricHistory-Workspace'
+	fromColumn: 'Metric History'.'Scope Id'
+	toColumn: Workspace.'Workspace Id'
+
+relationship 'RoleAssignments-Workspace'
+	fromColumn: 'Role Assignments'.'Scope Id'
+	toColumn: Workspace.'Workspace Id'
