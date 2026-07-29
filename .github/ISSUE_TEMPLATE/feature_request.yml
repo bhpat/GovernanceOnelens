@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest an idea for Governance OneLens (e.g. a new connector, screen, or capability)
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See [knowledge-base/09-phased-plan.md](../../knowledge-base/09-phased-plan.md) for the
+        current roadmap and [knowledge-base/10-connector-sdk.md](../../knowledge-base/10-connector-sdk.md)
+        if this is a new data-source connector idea.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to do that the app doesn't support today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work?
+    validations:
+      required: false

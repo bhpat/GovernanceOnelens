@@ -1,0 +1,31 @@
+name: Bug report
+description: Report something in Governance OneLens that isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please check
+        [ARCHITECTURE.md](../../ARCHITECTURE.md) first if this is about access control —
+        every allowlisted reader sees the whole tenant catalog by design, not a bug.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps, including whether this is the web app, scanner, or a deploy script.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Where are you running this?
+      placeholder: e.g. local dev server, deployed Fabric app, scanner on-demand run
+    validations:
+      required: false
