@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Signing in…</title>
+  </head>
+  <body>
+    <!--
+      Dedicated MSAL redirect-bridge target for the Ask OneLens Fabric token
+      popup (see src/services/askOneLens.ts). Deliberately NOT the SPA root:
+      msal-browser 4.x+ requires a small, dedicated page here that does
+      nothing but hand the auth response back to the main window over
+      BroadcastChannel — loading the full React app in the popup instead
+      would race the bridge and can leave `acquireTokenPopup` hanging until
+      it throws `timed_out` / `redirect_bridge_timeout` (this is exactly what
+      was happening before this page existed: the popup had nowhere to report
+      its result to since the app's root doesn't run this bridge script).
+      See https://aka.ms/msal.js.errors#timed_out and the COOP migration
+      guide linked from there.
+    -->
+    <script src="/msal-redirect-bridge.min.js"></script>
+    <script>
+      msalRedirectBridge.broadcastResponseToMainFrame().catch(function (err) {
+        console.error("MSAL redirect bridge failed", err);
+      });
+    </script>
+  </body>
+</html>

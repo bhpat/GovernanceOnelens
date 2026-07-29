@@ -1,0 +1,70 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node / build (defensive; app/.gitignore also covers these)
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Rayfin / secrets — never commit env files, publishable keys, or deploy records
+**/.env
+**/.env.*
+!**/.env.example
+**/rayfin/.env*
+**/rayfin/.deployments.json
+**/.rayfin/
+
+# Local extraction / temp artifacts
+_pdf_extract.txt
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+.vite/
+
+# Internal reference/research material — not part of the customer-facing template.
+# Kept locally for our own use; deliberately not shipped in a fork/clone.
+/Fabric_App_Security_Review_Skill.pdf
+/comprehensive-guide-to-data-and-ai-governance.pdf
+/docs/demo-script.md
+
+# Stale/inaccurate architecture diagram — superseded by the corrected ARCHITECTURE.md
+# text (this file described the same wrong access-control model, tombstone
+# mechanism, and hardcoded demo-tenant counts as an earlier draft of that doc).
+/ARCHITECTURE.excalidraw
+
+# Third-party legal/FAQ documents bundled with the downloaded Azure Public Service
+# Icons pack — incidental to the icon SVGs actually used by the app, not something
+# to redistribute in this repo.
+/app/icons/Azure_Public_Service_Icons/Azure_Icons_FAQ.pdf
+/app/icons/Azure_Public_Service_Icons/Microsoft_Terms_of_Use.pdf
+
+# Internal AI-agent build-phase runbook (how WE built this app, phase by phase,
+# as literal agent prompts with entry/exit gates) — redundant with the narrative
+# roadmap in knowledge-base/09-phased-plan.md and not needed to deploy/use the app.
+# Kept locally in case it's useful for planning future phases of this project.
+/execution/
+
+# Coding-agent / skill-installer tooling artifacts — not application source, and
+# unrelated to this product (installed by `npx skills add ...` while exploring an
+# abandoned @bklit chart-library experiment). Applies at repo root AND inside app/,
+# since these tools can be installed scoped to either directory.
+.agents/
+.claude/
+.mcp.json
+skills-lock.json
+
+# Generic/planning-stage governance education docs — redundant with the root
+# README's pitch and Microsoft Learn (which they cite as their own source), and
+# all four repeated the same fabricated "row-level @role trimming" access-control
+# claim that was corrected in ARCHITECTURE.md and the kept knowledge-base docs
+# (04, 05, 06, 07, 08). Kept locally for reference; not part of the public template.
+/knowledge-base/00-executive-summary.md
+/knowledge-base/01-data-governance-fundamentals.md
+/knowledge-base/02-fabric-governance-and-compliance.md
+/knowledge-base/03-onelake-catalog.md
